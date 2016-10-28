@@ -1,0 +1,24 @@
+{
+	"folders":
+	[
+		{
+			"path": "/"
+		}
+	],
+
+    "settings":
+    {
+        "tab_size": 4
+    },
+
+    "build_systems":
+    [
+        {
+            "name":"compile_and_run",
+            "cmd":
+            [
+                "compile_and_run.bat"
+            ]
+        }
+    ]
+}
