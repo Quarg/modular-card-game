@@ -1,0 +1,7 @@
+{
+    "name":"Giant",
+    "type":"unit",
+    "health":12,
+    "attack":12,
+    "abilities":[]
+}
