@@ -1,0 +1,7 @@
+{
+    "name":"Wisp",
+    "type":"unit",
+    "health":1,
+    "attack":1,
+    "abilities":[]
+}

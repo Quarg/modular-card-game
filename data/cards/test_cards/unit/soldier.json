@@ -1,0 +1,7 @@
+{
+    "name":"Soldier",
+    "type":"unit",
+    "health":3,
+    "attack":3,
+    "abilities":[]
+}

@@ -1,0 +1,7 @@
+Add the appropriate jar files to this folder (and the Natives folder) for the needed libraries.
+
+Libraries Needed:
+
+    javax.json
+    LWJGL 2.1 (+ Natives)
+    Slick2D

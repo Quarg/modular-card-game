@@ -1,0 +1,31 @@
+{
+    "name":"Double Burn",
+    "type":"spell",
+    "ability":
+    {
+        "selectors":
+        [
+            {
+                "type":"s_simple",
+                "potency":1
+            },
+            {
+                "type":"s_simple",
+                "potency":1
+            }
+        ],
+        "resolvables":
+        [
+            {
+                "type":"r_damage",
+                "target":0,
+                "potency":1
+            },
+            {
+                "type":"r_damage",
+                "target":1,
+                "potency":1
+            }
+        ]
+    }
+}

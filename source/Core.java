@@ -1,18 +1,95 @@
-/* Implementation Assumptions:
-
-    1:  A Resolvable's effect only affects a single target, and as such, scales linearly with each target affected.
-
-
-    Notable Cheat Cases:
-
-    * 
-*/
-
 import java.util.ArrayList;
+
+import java.io.FileReader;
+import java.io.FileNotFoundException;
+
+import javax.json.*;
 
 abstract class Card
 {
+    public final String name;
     public abstract int evaluateCost();
+    public abstract void printOut();
+
+    public Card(String name)
+    {
+        this.name = name;
+    }
+
+    public static Card loadCardFromJSONFile(String jsonFilePath)
+    {
+        try
+        {
+            JsonReader reader = Json.createReader(new FileReader("../data/cards/"+jsonFilePath+".json"));
+            JsonObject obj = reader.readObject();
+
+            String name = obj.getString("name");
+
+            String type = obj.getString("type");
+            if("spell".equals(type))
+            {
+                JsonObject ability_obj = obj.getJsonObject("ability");
+                Ability ability = loadAbilityFromJSONObject(ability_obj, false);
+                return new CardSpell(name, ability);
+            }
+            else if("unit".equals(type))
+            {
+                JsonArray abilities = obj.getJsonArray("abilities");
+
+                ArrayList<Ability> triggeredAbilities = new ArrayList<Ability>();
+
+                for (int i = 0; i < abilities.size(); i++) 
+                {
+                    triggeredAbilities.add(loadAbilityFromJSONObject(abilities.getJsonObject(i), true));
+                }
+
+                return new CardUnit(name, obj.getInt("attack", 0), obj.getInt("health", 0), triggeredAbilities);
+            }
+            else
+            {
+                //TODO: ERROR HANDLING
+                System.out.println("Card loaded ("+jsonFilePath+") was neither a SPELL nor a UNIT.");
+            }
+        }
+        catch(FileNotFoundException e)
+        {
+            System.out.println("Could not find file '"+jsonFilePath+"' for card loading.");
+        }
+        return null;
+    }
+
+    public static Ability loadAbilityFromJSONObject(JsonObject ability_obj, boolean triggered)
+    {
+        Ability ability = new Ability();
+
+        if(triggered)
+        {
+            ability.triggerCondition = EnumTriggerCondition.valueOf(ability_obj.getString("trigger"));
+        }
+
+        JsonArray selectors = ability_obj.getJsonArray("selectors");
+        for (int i = 0; i < selectors.size(); i++) 
+        {
+            JsonObject sel_obj = selectors.getJsonObject(i);
+
+            ability.selectorList.add(
+                ModuleRegistry.createSelector(sel_obj.getString("type"), 
+                    sel_obj.getInt("potency", 0), 
+                    sel_obj.getInt("range", 0)));
+        }
+        JsonArray resolvables = ability_obj.getJsonArray("resolvables");
+        for (int i = 0; i < resolvables.size(); i++) 
+        {
+            JsonObject res_obj = resolvables.getJsonObject(i);
+
+            ability.resolvableList.add(
+                ModuleRegistry.createResolvable(res_obj.getString("type"), 
+                    res_obj.getInt("target", 0), 
+                    res_obj.getInt("potency", 0)));
+        }
+
+        return ability;
+    }
 }
 
 class CardUnit extends Card
@@ -20,10 +97,15 @@ class CardUnit extends Card
     int attack;
     int health;
 
-        //This implementation only allows for one triggered ability per unit, nor does it allow for triggered abilities to be attached by other abilities.
-        //IDEA: Include trigger condition in Ability, and just ignore it when it's irrelevent (which is basically only on spells)
-
     ArrayList<Ability> triggeredAbilities;
+
+    public CardUnit(String name, int attack, int health, ArrayList<Ability> triggeredAbilities)
+    {
+        super(name);
+        this.attack = attack;
+        this.health = health;
+        this.triggeredAbilities = triggeredAbilities; 
+    }
 
     public int evaluateCost()
     {
@@ -34,7 +116,41 @@ class CardUnit extends Card
             value += ability.evaluatePower() * ability.triggerCondition.triggerValue;
         }
 
-        return (int) value;
+        return (int) Math.ceil(value);
+    }
+
+    public void printOut()
+    {
+        System.out.println(">~~--");
+        System.out.println("| Play Cost: < " + evaluateCost() + " >");
+        System.out.println("|~~--");
+        
+        for (Ability ability : triggeredAbilities)
+        {
+            System.out.println("| " + ability.triggerCondition.triggerText );
+            int i = 0;
+            for (Selector selector : ability.selectorList) 
+            {
+                System.out.println("| " + selector.getString(i) );
+                i++;
+            }
+
+            for (Resolvable resolvable : ability.resolvableList) 
+            {
+                System.out.println("| " + resolvable.getString() );
+            }
+
+            System.out.println("|~~--");
+        }
+        if(triggeredAbilities.size() == 0)
+        {
+            System.out.println("|");
+            System.out.println("|~~--");
+        }
+
+        System.out.println("| { "+ attack +" / "+ health +" }");
+
+        System.out.println(">~~--");
     }
 }
 
@@ -42,20 +158,43 @@ class CardSpell extends Card
 {
     Ability ability;
 
-    public CardSpell(Ability ability)
+    public CardSpell(String name, Ability ability)
     {
+        super(name);
         this.ability = ability;
     }
 
     public int evaluateCost()
     {
-        return (int) Math.ceil(ability.evaluatePower());
+        return (int) Math.ceil(ability.evaluatePower()) - 1;
+    }
+
+    public void printOut()
+    {
+        System.out.println(">~~--");
+        System.out.println("| Play Cost: < " + evaluateCost() + " >");
+        System.out.println("|~~--");
+        
+        int i = 0;
+        for (Selector selector : ability.selectorList) 
+        {
+            System.out.println("| " + selector.getString(i) );
+            i++;
+        }
+
+        for (Resolvable resolvable : ability.resolvableList) 
+        {
+            System.out.println("| " + resolvable.getString() );
+        }
+
+        System.out.println(">~~--");
     }
 }
 
 class Ability
 {
     EnumTriggerCondition triggerCondition;
+        //Ignore this for spells.
 
     ArrayList<Selector> selectorList;
     ArrayList<Resolvable> resolvableList;
@@ -120,17 +259,26 @@ class Ability
 
 abstract class Selector
 {
+    public Selector(){}
+    public int potency;    //json-param: "potency"
+    public int range;      //json-param: "range"
+
     ArrayList<Restriction> restrictionList;
 
     public abstract int getTargetCount();
+    public abstract String getString(int identifier);
 }
 
 abstract class Resolvable
 {
-    public int selectorReference;
+    public Resolvable(){}
+    public int selectorReference;   //json-param: "target"
+    public int potency;             //json-param: "potency"
+
         //A POSITIVE value indicates an effect benificial to the target.
         //A NEGATIVE value indicates an effect harmful to the target.
     public abstract double getBaseValue();
+    public abstract String getString();
 }
 
 class Restriction
@@ -154,15 +302,48 @@ class Restriction
 
 enum EnumTriggerCondition
 {
-    ENTER_PLAY(1),
-    LEAVE_PLAY(0.8),
-    TURN_START(2),
-    TURN_END(2.2);
+    ENTER_PLAY(1, "On Enter:", true),
+    LEAVE_PLAY(0.8, "On Leave:", false),
+    TURN_START(2, "On Turn Start:", true),
+    TURN_END(2.5, "On Turn End:", false);
 
-    final double triggerValue;
+    public final double triggerValue;
+    public final String triggerText;
+    public final boolean synchronous;
 
-    EnumTriggerCondition(double triggerValue)
+    EnumTriggerCondition(double triggerValue, String triggerText, boolean synchronous)
     {
         this.triggerValue = triggerValue;
+        this.triggerText = triggerText;
+        this.synchronous = synchronous;
+    }
+}
+
+abstract class ModuleRegistry
+{
+    public static Selector createSelector(String typeName, int potency, int range)
+    {
+        switch (typeName)
+        {
+            case "s_simple":
+                return new SimpleSelector(potency);
+        }
+        return null;
+    }
+
+    public static Resolvable createResolvable(String typeName, int selector_reference, int potency)
+    {
+        switch (typeName)
+        {
+            case "r_damage":
+                return new ModDamage(selector_reference, potency);
+        }
+        return null;
+    }
+
+    public static Selector createRestriction(String typeName, int min, int max)
+    {
+            //TODO!    
+        return null;
     }
 }

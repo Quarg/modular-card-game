@@ -1,0 +1,22 @@
+{
+    "name":"Burn 1",
+    "type":"spell",
+    "ability":
+    {
+        "selectors":
+        [
+            {
+                "type":"s_simple",
+                "potency":1
+            }
+        ],
+        "resolvables":
+        [
+            {
+                "type":"r_damage",
+                "target":0,
+                "potency":1
+            }
+        ]
+    }
+}

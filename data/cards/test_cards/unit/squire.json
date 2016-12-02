@@ -1,0 +1,7 @@
+{
+    "name":"Squire",
+    "type":"unit",
+    "health":3,
+    "attack":2,
+    "abilities":[]
+}

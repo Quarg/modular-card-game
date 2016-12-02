@@ -1,0 +1,27 @@
+{
+    "name":"Fire Wisp",
+    "type":"unit",
+    "health":1,
+    "attack":1,
+    "abilities":
+    [
+        {
+            "trigger":"ENTER_PLAY",
+            "selectors":
+            [
+                {
+                    "type":"s_simple",
+                    "potency":1
+                }
+            ],
+            "resolvables":
+            [
+                {
+                    "type":"r_damage",
+                    "target":0,
+                    "potency":1
+                }
+            ]
+        }
+    ]
+}
