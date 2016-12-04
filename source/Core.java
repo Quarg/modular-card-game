@@ -5,9 +5,13 @@ import java.io.FileNotFoundException;
 
 import javax.json.*;
 
+import org.newdawn.slick.Image;
+
 abstract class Card
 {
     public final String name;
+    public Image image;
+
     public abstract int evaluateCost();
     public abstract void printOut();
 

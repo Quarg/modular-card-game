@@ -1,75 +1,91 @@
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Match
 {
-    final int unit_cap;
-    //final int deck1_size;
-    //final int deck2_size;
-        //Match Properties.
+    final int field_width;
+    final int field_height;
 
-    PlayerSide player_1;
-    PlayerSide player_2;
+    public Unit[][] field;
 
-    public Match(int unit_cap, Card[] p1_deck, Card[] p2_deck)
+    public PlayerSide player_1;
+    public PlayerSide player_2;
+
+    public Match(int field_width, int field_height, Card[] p1_deck, Card[] p2_deck)
     {
-        this.unit_cap = unit_cap;
+        this.field_width = field_width;
+        this.field_height = field_height;
 
-        player_1 = new PlayerSide(unit_cap, p1_deck);
-        player_2 = new PlayerSide(unit_cap, p2_deck);
+        field = new Unit[field_width][field_height];
+
+        player_1 = new PlayerSide(p1_deck);
+        player_2 = new PlayerSide(p2_deck);
     }
 }
 
 class PlayerSide
 {
-    public PlayerSide(int unit_cap, Card[] deck)
-    {
-        this.deck = deck;
-        units = new Unit[unit_cap];
-    }
+    //Referring to cards by reference IDs may be necessary for net-code.
 
+    public int cardsInDeck;
     public Card[] deck;
+
+    public ArrayList<Card> hand;
+
     public Unit[] units;
 
-    public ArrayList<Integer> hand;
-    public ArrayList<Integer> library;
-    public ArrayList<Integer> discard;
-    public ArrayList<Integer> inplay;
-
-    public void printHand()
+    public PlayerSide(Card[] deck)
     {
-        int i = 0;
-        for (int card_id : hand) 
+        this.deck = deck;
+        hand = new ArrayList<Card>();
+        cardsInDeck = deck.length;
+
+        shuffleDeck();
+        shuffleDeck();
+        shuffleDeck();
+    }
+
+    public void shuffleDeck()
+    {
+        //TODO: Improve Random Number Generation for this shuffle, 
+        //          as it simply cannot create all sequences of card shuffles without a far greater bit depth.
+
+        Random rand = new Random();
+
+        for (int i = cardsInDeck - 1; i > 0; i--) 
         {
-            System.out.println("Card #"+i+":");
-            deck[card_id].printOut();
-            i++;
+            int j = rand.nextInt(i + 1);
+            if(j != i)
+            {
+                Card swap = deck[i];
+                deck[i] = deck[j];
+                deck[j] = swap;   
+            }
         }
     }
 
-    public void printUnits()
+    public boolean drawCard()
     {
-        /*
-        int i = 0;
-        for (int card_id : hand) 
-        {
-            System.out.println("Card #"+i+":");
-            deck[card_id].printOut();
-            i++;
-        }
-        */
+        if(cardsInDeck <= 0)
+            return false;
+
+        hand.add(deck[cardsInDeck - 1]);
+        deck[cardsInDeck - 1] = null;
+        cardsInDeck--;
+
+        return true;
     }
 }
 
 class Unit
 {
-    public static Unit createFromCard(Match Match, boolean is_player2, int card_id)
+    public static Unit createFromCard(Match match, boolean is_player2, CardUnit card)
     {
         PlayerSide side;
         if(!is_player2)
-            side = Match.player_1;
+            side = match.player_1;
         else
-            side = Match.player_2;
-        CardUnit card = (CardUnit)side.deck[card_id];
+            side = match.player_2;
 
         Unit unit = new Unit();
         unit.attack = card.attack;
@@ -88,6 +104,8 @@ class Unit
     int damage;     //damage to "health"
 
     CardUnit card;
+
+    boolean player_side;
 
     public void printOut()
     {
