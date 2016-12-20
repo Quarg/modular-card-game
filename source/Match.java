@@ -96,16 +96,16 @@ class Unit
     }
 
         //Unit Stats
-    int attack;
-    int health;
+    public int attack;
+    public int health;
 
         //Stat "Damage"
-    int atrophy;    //damage to "attack"
-    int damage;     //damage to "health"
+    public int atrophy;    //damage to "attack"
+    public int damage;     //damage to "health"
 
-    CardUnit card;
+    public CardUnit card;
 
-    boolean player_side;
+    public boolean player_side;
 
     public void printOut()
     {

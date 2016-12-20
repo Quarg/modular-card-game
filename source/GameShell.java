@@ -35,7 +35,12 @@ public class GameShell extends BasicGame
     protected int sh;
     protected int sw;
 
+
+    protected Unit test_unit;
+
     protected int card_highlight;
+    protected int card_select;
+    protected EnumInputState input_state;
 
     public GameShell(String gamename, int screenWidth, int screenHeight)
     {
@@ -59,6 +64,14 @@ public class GameShell extends BasicGame
 
         sh = screenHeight;
         sw = screenWidth;
+
+        test_unit = new Unit();
+        test_unit.attack = 3;
+        test_unit.health = 6;
+        test_unit.damage = 2;
+
+        input_state = EnumInputState.CARD_SELECT;
+        card_select = card_highlight = -1;
     }
 
     @Override
@@ -94,18 +107,31 @@ public class GameShell extends BasicGame
         mx = in.getMouseX();
         my = in.getMouseY();
 
-        if(my > 550)
+        if(input_state == EnumInputState.CARD_SELECT || input_state == EnumInputState.TARGET_SELECT)
         {
-            float f = ((mx - 240) / 800f) * match.player_1.hand.size();
-            if(f < 0 || f >= match.player_1.hand.size())
+            if(my > 550)
             {
-                f = -1;
+                float f = ((mx - 240) / 800f) * match.player_1.hand.size();
+                if(f < 0 || f >= match.player_1.hand.size())
+                {
+                    f = -1;
+                }
+                card_highlight = (int)f;
             }
-            card_highlight = (int)f;
-        }
-        else
-        {
-            card_highlight = -1;
+            else
+            {
+                card_highlight = -1;
+            }
+
+            if(in.isMousePressed(0) || in.isMousePressed(1) || in.isMousePressed(2) || in.isMousePressed(3))
+            {
+                System.out.println("BUTTON PRESSED");
+                if(card_highlight >= 0)
+                {
+                    input_state = EnumInputState.TARGET_SELECT;
+                    card_select = card_highlight;
+                }
+            }
         }
     }
 
@@ -129,8 +155,21 @@ public class GameShell extends BasicGame
                     tile_width - epsilon * 2, 
                     tile_height - epsilon *2); 
 
+                if(match.field[x][y] != null)
+                {
+                    drawUnit(g, match.field[x][y], 
+                        x * tile_width - (match.field_width * tile_width / 2) + 640, 
+                        y * tile_height - (match.field_height * tile_height / 2) + 275);
+                }
+
+                /*
                 if(x == 1 && y == 1)
                 {
+                    drawUnit(g, test_unit, 
+                        x * tile_width - (match.field_width * tile_width / 2) + 640, 
+                        y * tile_height - (match.field_height * tile_height / 2) + 275);
+
+                    /*
                     g.drawImage(img_unit,
                         x * tile_width - (match.field_width * tile_width / 2) + 640,
                         y * tile_height - (match.field_height * tile_height / 2) + 275);
@@ -142,7 +181,9 @@ public class GameShell extends BasicGame
                         x * tile_width - (match.field_width * tile_width / 2) + 640 + 115, 
                         y * tile_height - (match.field_height * tile_height / 2) + 275 + 55);
                     g.resetFont();
+                    ///
                 }
+                */
             }                
         }
 
@@ -180,8 +221,17 @@ public class GameShell extends BasicGame
 
             g.translate(-xSpread * x_delta, - 50 + 50 * x_delta * x_delta);
 
-            if(i == card_highlight)
-                g.drawImage(img_highlight, - img_highlight.getWidth()/2f, - img_highlight.getHeight()/2f);
+            if(i == card_select)
+            {
+                if(i == card_highlight)
+                    g.drawImage(img_highlight, - img_highlight.getWidth()/2f, - img_highlight.getHeight()/2f, Color.cyan);
+                else
+                    g.drawImage(img_highlight, - img_highlight.getWidth()/2f, - img_highlight.getHeight()/2f, Color.blue);
+            }
+            else if (i == card_highlight)
+            {
+                g.drawImage(img_highlight, - img_highlight.getWidth()/2f, - img_highlight.getHeight()/2f, Color.white);
+            }
 
             g.drawImage(card.image, -card.image.getWidth()/2f, -card.image.getHeight()/2f);
             g.drawString("["+x_delta+"]", -50, -200);
@@ -190,6 +240,21 @@ public class GameShell extends BasicGame
             i++;
         }
         g.popTransform();
+    }
+
+    public void drawUnit(Graphics g, Unit unit, int x, int y)
+    {
+        int x_delta = 20;
+        int y_delta = 15;
+
+        g.drawImage(img_unit, x,y);
+        g.setFont(font_large);
+          g.drawString(Integer.toString(unit.attack - unit.atrophy), x + 5, y + 55);
+          g.drawString(Integer.toString(unit.health - unit.damage), x + 110, y + 55);
+        g.setFont(font_small);
+          g.drawString("/" + unit.attack, x + 5 + x_delta, y + 55 + y_delta);
+          g.drawString("/" + unit.health, x + 110 + x_delta, y + 55 + y_delta);
+        g.resetFont();
     }
 
     public Image createCardImage(Card card)
@@ -273,11 +338,6 @@ public class GameShell extends BasicGame
         return null;
     }
 
-    public void drawUnit(Unit unit)
-    {
-        //TODO
-    }
-
     @Override
     public void keyPressed(int key, char c)
     {
@@ -314,3 +374,10 @@ public class GameShell extends BasicGame
         }
     }
 }
+
+enum EnumInputState
+{
+    OFF_TURN,
+    CARD_SELECT,
+    TARGET_SELECT;
+} 
