@@ -1,6 +1,8 @@
+package uk.org.maxcd.modularcard.ability.resolvable;
+
 import java.util.ArrayList;
 
-package uk.org.maxcd.modularcard.ability.resolvable;
+import uk.org.maxcd.modularcard.ability.Resolvable;
 
 public class ModDamage extends Resolvable
 {

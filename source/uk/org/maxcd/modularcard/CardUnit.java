@@ -1,13 +1,16 @@
+package uk.org.maxcd.modularcard;
+
 import java.util.ArrayList;
 
-package uk.org.maxcd.modularcard;
+import uk.org.maxcd.modularcard.*;
+import uk.org.maxcd.modularcard.ability.*;
 
 public class CardUnit extends Card
 {
-    int attack;
-    int health;
+    public int attack;
+    public int health;
 
-    ArrayList<Ability> triggeredAbilities;
+    public ArrayList<Ability> triggeredAbilities;
 
     public CardUnit(String name, int attack, int health, ArrayList<Ability> triggeredAbilities)
     {

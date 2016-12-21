@@ -1,6 +1,11 @@
+package uk.org.maxcd.modularcard;
+
 import java.util.ArrayList;
 
-package uk.org.maxcd.modularcard;
+import uk.org.maxcd.modularcard.*;
+import uk.org.maxcd.modularcard.ability.*;
+import uk.org.maxcd.modularcard.ability.resolvable.*;
+import uk.org.maxcd.modularcard.ability.selector.*;
 
 abstract class ModuleRegistry
 {

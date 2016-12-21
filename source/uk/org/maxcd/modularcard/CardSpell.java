@@ -1,10 +1,13 @@
+package uk.org.maxcd.modularcard;
+
 import java.util.ArrayList;
 
-package uk.org.maxcd.modularcard;
+import uk.org.maxcd.modularcard.*;
+import uk.org.maxcd.modularcard.ability.*;
 
 public class CardSpell extends Card
 {
-    Ability ability;
+    public Ability ability;
 
     public CardSpell(String name, Ability ability)
     {

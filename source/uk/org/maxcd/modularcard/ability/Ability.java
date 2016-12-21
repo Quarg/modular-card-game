@@ -1,14 +1,17 @@
+package uk.org.maxcd.modularcard.ability;
+
 import java.util.ArrayList;
 
-package uk.org.maxcd.modularcard.ability;
+import uk.org.maxcd.modularcard.*;
+import uk.org.maxcd.modularcard.ability.*;
 
 public class Ability
 {
-    EnumTriggerCondition triggerCondition;
+    public EnumTriggerCondition triggerCondition;
         //Ignore this for spells.
 
-    ArrayList<Selector> selectorList;
-    ArrayList<Resolvable> resolvableList;
+    public ArrayList<Selector> selectorList;
+    public ArrayList<Resolvable> resolvableList;
 
     public Ability()
     {

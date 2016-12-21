@@ -1,6 +1,8 @@
+package uk.org.maxcd.modularcard.ability;
+
 import java.util.ArrayList;
 
-package uk.org.maxcd.modularcard.ability;
+import uk.org.maxcd.modularcard.*;
 
 public enum EnumTriggerCondition
 {

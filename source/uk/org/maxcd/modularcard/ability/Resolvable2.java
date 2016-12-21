@@ -2,9 +2,9 @@ package uk.org.maxcd.modularcard.ability;
 
 import java.util.ArrayList;
 
-public abstract class Resolvable
+public abstract class Resolvable2
 {
-    public Resolvable(){}
+    public Resolvable2(){}
     public int selectorReference;   //json-param: "target"
     public int potency;             //json-param: "potency"
 
@@ -12,4 +12,6 @@ public abstract class Resolvable
         //A NEGATIVE value indicates an effect harmful to the target.
     public abstract double getBaseValue();
     public abstract String getString();
+
+    //public abstract double getValue()
 }

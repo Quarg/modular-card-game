@@ -1,6 +1,10 @@
 @echo off
 cd %~p0source/
-javac *.java -d ../out/ -cp ../lib/* 
+
+dir /s /B *.java > ../sources.txt
+
+javac @../sources.txt -d ../out/ -cp ../lib/*
+
 cd ../out/
-java -cp .;../lib/* -Djava.library.path=.;../natives/ TestInstance
-java -cp .;../lib/* -Djava.library.path=.;../natives/ GameShell
+::java -cp .;../lib/* -Djava.library.path=.;../natives/ TestInstance
+::java -cp .;../lib/* -Djava.library.path=.;../natives/ GameShell

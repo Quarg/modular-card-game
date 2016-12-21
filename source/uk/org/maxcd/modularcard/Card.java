@@ -1,3 +1,5 @@
+package uk.org.maxcd.modularcard;
+
 import java.util.ArrayList;
 
 import java.io.FileReader;
@@ -7,7 +9,8 @@ import javax.json.*;
 
 import org.newdawn.slick.Image;
 
-package uk.org.maxcd.modularcard;
+import uk.org.maxcd.modularcard.*;
+import uk.org.maxcd.modularcard.ability.*;
 
 public abstract class Card
 {

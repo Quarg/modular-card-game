@@ -1,6 +1,9 @@
+package uk.org.maxcd.modularcard.ability.selector;
+
 import java.util.ArrayList;
 
-package uk.org.maxcd.modularcard.ability.selector;
+import uk.org.maxcd.modularcard.ability.Selector;
+import uk.org.maxcd.modularcard.ability.Restriction;
 
 public class SimpleSelector extends Selector
 {
